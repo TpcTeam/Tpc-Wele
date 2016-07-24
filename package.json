@@ -1,0 +1,14 @@
+{
+  "name": "tpcwele",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "soundmanager2": "^2.97.20150601-a"
+  }
+}

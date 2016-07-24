@@ -1,0 +1,100 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <input id="file-input" type="file" accept="audio/*" disabled/>
+    <div id="duration"></div>
+    <button id="play">Play</button>
+    <button id="pause">Pause</button>
+    <button id="reset">Reset</button>
+    <button id="prev">Prev</button>
+    <button id="next">Next</button>
+
+    <script src="node_modules/soundmanager2/script/soundmanager2-jsmin.js"></script>
+    <script>
+      var fileInput = document.querySelector('#file-input');
+      var durationDiv = document.querySelector('#duration');
+
+      soundManager.setup({
+        onready: function() {
+          fileInput.disabled = false;
+        },
+
+        ontimeout: function() {
+          durationDiv.innerText = 'Unable to initialize soundmanager!';
+        }
+      });
+
+      var audio = null;
+      var mediaFile = null;
+      var reader = new FileReader();
+
+      function round(duration) {
+        return Math.floor(duration / 1000);
+      }
+
+      reader.addEventListener('load', function() {
+        audio = soundManager.createSound({
+          id: 'audio',
+          url: reader.result,
+          whileplaying: function() {
+            durationDiv.innerText = 'Duration: ' + round(audio.position) + ' / ' + round(audio.duration);
+          },
+          onload: function() {
+            durationDiv.innerText = 'Duration: ' + 0 + ' / ' + round(audio.duration);
+          },
+          onfinish: function() {
+
+          }
+        }).load();
+      }, false);
+
+      fileInput.addEventListener('change', function(e) {
+        mediaFile = e.target.files[0];
+        if (mediaFile) {
+          durationDiv.innerText = "Loading: " + mediaFile.name;
+          reader.readAsDataURL(mediaFile);
+        }
+      });
+
+      document.querySelector('#play').addEventListener('click', function() {
+        if (!audio) return;
+        audio.play();
+      });
+
+      document.querySelector('#pause').addEventListener('click', function() {
+        if (!audio) return;
+        audio.pause();
+      });
+
+      document.querySelector('#reset').addEventListener('click', function() {
+        if (!audio) return;
+        audio.setPosition(0);
+      });
+
+      document.querySelector('#next').addEventListener('click', function() {
+        if (!audio) return;
+        audio.setPosition(Math.min(audio.position + 5000, audio.duration));
+      });
+
+      document.querySelector('#prev').addEventListener('click', function() {
+        if (!audio) return;
+        audio.setPosition(Math.max(audio.position - 5000, 0));
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.keyCode == 32) {
+          if (!audio) return;
+          if (audio.playState == 0 || audio.paused)
+            audio.play();
+          else
+            audio.pause();
+        } else if (e.keyCode == 37) {
+          document.querySelector('#prev').click();
+        } else if (e.keyCode == 39) {
+          document.querySelector('#next').click();
+        }
+      });
+    </script>
+  </body>
+</html>
